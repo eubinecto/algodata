@@ -1,4 +1,7 @@
 
+from abc import ABC
+
+
 class Tree:
     class Position:
         # 왜 추가 파라미터가 없으면 init 구현필요 X.
@@ -85,7 +88,7 @@ class LinkedTree(Tree):
         pass
 
 
-class BinaryTree(Tree):
+class BinaryTree(Tree, ABC):
     pass
 
 
