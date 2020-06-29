@@ -35,7 +35,7 @@ class Tree:
     def num_children(self, p: Position) -> int:
         raise NotImplementedError("this must be implemented by subclasses")
 
-    def children(self, p: Position):
+    def children(self, p: Position) -> any:
         raise NotImplementedError("this must be implemented by subclasses")
 
     def __len__(self) -> int:
@@ -60,6 +60,53 @@ class Tree:
         :return: True if the position is leaf, False if not.
         """
         return self.num_children(p) == 0
+
+    def height(self, p=None) -> int:
+        if p is None:
+            # if p is None, then return the height of the tree
+            # which is the height of the root pos.
+            p = self.root()
+
+        # return the height of the position
+        return self._height2(p)
+
+    def _height1(self, p) -> int:
+        """
+        runs in O(N**2)
+        :param p:
+        :return:
+        """
+        if p is None:
+            p = self.root()
+
+        # O(n): for p in self.positions() if p.is_leaf() -> list[Position] (returns an iterable)
+        # O(n): max([list comprehension)]) -> loop through the iterable
+        # O(n) * O(n) = O(n**2)
+        return max([self.depth(p) for p in self.positions() if self.is_leaf(p)])
+
+    def _height2(self, p: Position) -> int:
+        """
+        runs in O(N) (recursive)
+        :param p:
+        :return:
+        """
+        # base case
+        if self.is_leaf(p):
+            # the height of a leaf is zero. (def)
+            return 0
+        else: # step case
+            return 1 + max([self._height2(child) for child in self.children(p)])
+
+    def positions(self) -> iter:
+        pass
+
+    def depth(self, p) -> int:
+        if self.is_root(p):
+            return 0
+        else:
+            # 엄마가 두명은 아니잖아? 그냥 줄타고 올라가면 돼.
+            # 아이들은 여려명일 수 있으니 height는 제일 키큰놈을 찾아야한다 (max)
+            return 1 + self.depth(self.parent(p))
 
 
 class LinkedTree(Tree):
