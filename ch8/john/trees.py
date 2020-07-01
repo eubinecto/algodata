@@ -15,6 +15,10 @@ class Tree(metaclass=ABCMeta):
             return not (self == other)
 
     @abstractmethod
+    def positions(self):
+        pass
+
+    @abstractmethod
     def root(self) -> Position:
         """
         :return: position of root of tree T.
@@ -70,6 +74,49 @@ class Tree(metaclass=ABCMeta):
         :return: either the tree is empty or not
         """
         return len(self) == 0
+
+    def depth(self, p: Position) -> int:
+        """
+        depth is counted from top down
+        when counting, itself is excluded.
+        :param p: Query position
+        :return: integer
+        """
+        if self.is_root(p):
+            return 0
+        return 1 + self.depth(self.parent(p))
+
+    def _height1(self) -> int:
+        """
+        :return: integer
+        """
+        # As this is not recursive solution, base case is not needed.
+        # self.postions(p) returns iterable of all positions as iterable.
+        return 1 + max(self.depth(position) for position in self.positions() if self.is_leaf(position))
+
+    def _height2(self, p:Position) -> int:
+        """
+        :param p: query position
+        :return: integer
+        """
+        if self.is_leaf(p):
+            return 0
+
+        return 1 + max(self._height2(child) for child in self.children(p))
+
+    def height(self, p:Position =None) -> int:
+        """
+        height is counted from lowest leaf up to the query position
+        when counting, itself is excluded.
+        :param p: query position
+        :return: integer
+        """
+        if p is None:
+            p = self.root()
+
+        return self._height2(p)
+
+
 
 
 class LinkedTree(Tree):
