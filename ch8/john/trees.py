@@ -91,7 +91,7 @@ class Tree(metaclass=ABCMeta):
         :return: integer
         """
         # As this is not recursive solution, base case is not needed.
-        # self.postions(p) returns iterable of all positions as iterable.
+        # self.positions(p) returns iterable of all positions as iterable.
         return 1 + max(self.depth(position) for position in self.positions() if self.is_leaf(position))
 
     def _height2(self, p:Position) -> int:
@@ -115,8 +115,6 @@ class Tree(metaclass=ABCMeta):
             p = self.root()
 
         return self._height2(p)
-
-
 
 
 class LinkedTree(Tree):
@@ -149,7 +147,46 @@ class LinkedTree(Tree):
 
 
 class BinaryTree(Tree, metaclass=ABCMeta):
-    pass
+    @abstractmethod
+    def left(self, p: Tree.Position) -> Tree.Position:
+        """
+        :param p: Query position
+        :return: left child
+        """
+        return NotImplementedError("must be implemented in subclass")
+
+    @abstractmethod
+    def right(self, p: Tree.Position) -> Tree.Position:
+        """
+        :param p: Query position
+        :return: right child
+        """
+        return NotImplementedError("must be implemented in subclass")
+
+    @abstractmethod
+    def sibling(self, p: Tree.Position) -> Tree.Position:
+        """
+        :param p:
+        :return:
+        """
+        parent = self.parent(p)
+        if parent is None:      # p is root
+            return None
+
+        if self.left(parent) == p:
+            return self.right(parent)
+        else:
+            return self.left(parent)
+
+    def children(self, p: Tree.Position):
+        """
+        :param p: Query position (parent)
+        :return: Generator
+        """
+        if self.left(p) is not None:
+            yield self.left(p)
+        if self.right(p) is not None:
+            yield self.right(p)
 
 
 class ArrayBinaryTree(BinaryTree):
