@@ -70,15 +70,12 @@ class Tree:
         # return the height of the position
         return self._height2(p)
 
-    def _height1(self, p) -> int:
+    def _height1(self) -> int:
         """
         runs in O(N**2)
         :param p:
         :return:
         """
-        if p is None:
-            p = self.root()
-
         # O(n): for p in self.positions() if p.is_leaf() -> list[Position] (returns an iterable)
         # O(n): max([list comprehension)]) -> loop through the iterable
         # O(n) * O(n) = O(n**2)
@@ -106,6 +103,7 @@ class Tree:
         else:
             # 엄마가 두명은 아니잖아? 그냥 줄타고 올라가면 돼.
             # 아이들은 여려명일 수 있으니 height는 제일 키큰놈을 찾아야한다 (max)
+            # 1을 더해야 하나 말아야 하나가 고민될 때는, base case를 생각을 한다.
             return 1 + self.depth(self.parent(p))
 
 
@@ -136,7 +134,40 @@ class LinkedTree(Tree):
 
 
 class BinaryTree(Tree, ABC):
-    pass
+
+    def left(self, p: Tree.Position) -> Tree.Position:
+        """
+        returns the left pos of the given pos
+        :param p:
+        :return:
+        """
+        raise NotImplementedError
+
+    def right(self, p: Tree.Position) -> Tree.Position:
+        """
+        returns the right pos of the given pos
+        :param p:
+        :return:
+        """
+        raise NotImplementedError
+
+    def sibling(self, p: Tree.Position):
+        parent = self.parent(p)
+
+        if parent is None:
+            return None
+
+        if self.left(parent) == p:
+            return self.right(parent)
+        else:
+            return self.left(parent)
+
+    def children(self, p: Tree.Position):
+
+        if self.left(p) is not None:
+            yield self.left(p)
+        if self.right(p) is not None:
+            yield self.right(p)
 
 
 class ArrayBinaryTree(BinaryTree):
