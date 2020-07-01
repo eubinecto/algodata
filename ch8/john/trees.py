@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from typing import Generator, Iterator, TypeVar
 
 
 class Tree(metaclass=ABCMeta):
@@ -15,7 +16,7 @@ class Tree(metaclass=ABCMeta):
             return not (self == other)
 
     @abstractmethod
-    def positions(self):
+    def positions(self) -> Generator[Position, ...]:
         pass
 
     @abstractmethod
@@ -42,7 +43,7 @@ class Tree(metaclass=ABCMeta):
         raise NotImplementedError("Must be implemented in sublcass")
 
     @abstractmethod
-    def children(self, p: Position):
+    def children(self, p: Position) -> Generator[Position, ...]:
         """
         :param p: query position
         :return: children of query position
@@ -94,7 +95,7 @@ class Tree(metaclass=ABCMeta):
         # self.positions(p) returns iterable of all positions as iterable.
         return 1 + max(self.depth(position) for position in self.positions() if self.is_leaf(position))
 
-    def _height2(self, p:Position) -> int:
+    def _height2(self, p: Position) -> int:
         """
         :param p: query position
         :return: integer
@@ -104,7 +105,7 @@ class Tree(metaclass=ABCMeta):
 
         return 1 + max(self._height2(child) for child in self.children(p))
 
-    def height(self, p:Position =None) -> int:
+    def height(self, p: Position = None) -> int:
         """
         height is counted from lowest leaf up to the query position
         when counting, itself is excluded.
@@ -139,7 +140,7 @@ class LinkedTree(Tree):
     def num_children(self, p: Position) -> int:
         pass
 
-    def children(self, p: Position):
+    def children(self, p: Position) -> Generator[Position, ...]:
         pass
 
     def __len__(self) -> int:
@@ -148,7 +149,7 @@ class LinkedTree(Tree):
 
 class BinaryTree(Tree, metaclass=ABCMeta):
     @abstractmethod
-    def left(self, p: Tree.Position) -> Tree.Position:
+    def left(self, p: Tree.Position) -> [Tree.Position, None]:
         """
         :param p: Query position
         :return: left child
@@ -156,7 +157,7 @@ class BinaryTree(Tree, metaclass=ABCMeta):
         return NotImplementedError("must be implemented in subclass")
 
     @abstractmethod
-    def right(self, p: Tree.Position) -> Tree.Position:
+    def right(self, p: Tree.Position) -> [Tree.Position, None]:
         """
         :param p: Query position
         :return: right child
@@ -164,7 +165,7 @@ class BinaryTree(Tree, metaclass=ABCMeta):
         return NotImplementedError("must be implemented in subclass")
 
     @abstractmethod
-    def sibling(self, p: Tree.Position) -> Tree.Position:
+    def sibling(self, p: Tree.Position) -> [Tree.Position, None]:
         """
         :param p:
         :return:
@@ -178,7 +179,7 @@ class BinaryTree(Tree, metaclass=ABCMeta):
         else:
             return self.left(parent)
 
-    def children(self, p: Tree.Position):
+    def children(self, p: Tree.Position) -> Generator[Tree.Position, Tree.Position]:
         """
         :param p: Query position (parent)
         :return: Generator
