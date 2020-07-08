@@ -1,5 +1,6 @@
 
 from abc import ABC
+from typing import Generator
 
 
 class Tree:
@@ -67,16 +68,18 @@ class Tree:
         # return the height of the position
         return self._height2(p)
 
-    def _height1(self) -> int:
-        """
-        runs in O(N**2)
-        :param p:
-        :return:
-        """
-        # O(n): for p in self.positions() if p.is_leaf() -> list[Position] (returns an iterable)
-        # O(n): max([list comprehension)]) -> loop through the iterable
-        # O(n) * O(n) = O(n**2)
-        return max([self.depth(p) for p in self.positions() if self.is_leaf(p)])
+    # def _height1(self) -> int:
+    #     """
+    #     runs in O(N**2)
+    #     :param p:
+    #     :return:
+    #     """
+    #     # O(n): for p in self.positions() if p.is_leaf() -> list[Position] (returns an iterable)
+    #     # O(n): max([list comprehension)]) -> loop through the iterable
+    #     # O(n) * O(n) = O(n**2)
+    #     return max([self.depth(p) for p in self.positions() if self.is_leaf(p)])
+    # def positions(self) -> iter:
+    #     pass
 
     def _height2(self, p: Position) -> int:
         """
@@ -90,9 +93,6 @@ class Tree:
             return 0
         else:  # step case
             return 1 + max([self._height2(child) for child in self.children(p)])
-
-    def positions(self) -> iter:
-        pass
 
     def depth(self, p) -> int:
         if self.is_root(p):
@@ -158,8 +158,7 @@ class BinaryTree(Tree, ABC):
         else:
             return self.left(parent)
 
-    def children(self, p: Tree.Position):
-
+    def children(self, p: Tree.Position) -> Generator:
         if self.left(p) is not None:
             yield self.left(p)
         if self.right(p) is not None:
@@ -167,6 +166,12 @@ class BinaryTree(Tree, ABC):
 
 
 class ArrayBinaryTree(BinaryTree):
+    def left(self, p: Tree.Position) -> Tree.Position:
+        pass
+
+    def right(self, p: Tree.Position) -> Tree.Position:
+        pass
+
     class Position(BinaryTree.Position):
 
         def element(self):
@@ -197,16 +202,25 @@ class LinkedBinaryTree(BinaryTree):
         __slots__ = 'parent', 'element', "left", "right"
 
         def __init__(self,
-                     element,
+                     element: any,
                      parent=None,
                      left=None,
                      right=None):
+            """
+            :param element: could be int, str, float, etc
+            :param parent: type Node, or None if empty
+            :param left: type Node, or None if empty
+            :param right: type Node or None if empty
+            """
             self.element = element
             self.parent = parent
             self.left = left
             self.right = right
 
     class Position(BinaryTree.Position):
+        """
+        사실 Position 이라는 이름은 misleading. "호적"
+        """
 
         def __init__(self,
                      container: BinaryTree,
@@ -261,23 +275,139 @@ class LinkedBinaryTree(BinaryTree):
         """
         return self.Position(self, node) if node is not None else None
 
-    def root(self) -> Position:
-        pass
+    __slots__ = '_root', '_size'
 
-    def parent(self, p: Position) -> Position:
-        pass
+    def __init__(self):
+        """
+        init an empty binary tree.
+        """
+        self._root: (LinkedBinaryTree.Position, None) = None
+        self._size = 0
+
+    def __len__(self):
+        return self._size
+
+    def root(self) -> (Position, None):
+        # linked binary tree의 posiiton implementation을 사옹.
+        return self._make_position(self._root)
+
+    def parent(self, p: Position) -> (Position, None):
+        node = self._validate(p)
+        return self._make_position(node.parent)
+
+    def left(self, p: Position) -> (Position, None):
+        node = self._validate(p)
+        return self._make_position(node.left)
+
+    def right(self, p: Position) -> (Position, None):
+        node = self._validate(p)
+        return self._make_position(node.right)
 
     def num_children(self, p: Position) -> int:
-        pass
+        node = self._validate(p)
+        count = 0
+        if node.left is not None:
+            count += 1
+        if node.right is not None:
+            count += 1
+        return count
 
-    def children(self, p: Position):
-        pass
+    def _add_root(self, e: any) -> Position:
+        if self._root is not None:
+            raise ValueError("Root already exists")
 
-    def left(self, p: Position) -> Position:
-        pass
+        self._root = self.Node(e)
 
-    def right(self, p: Position) -> Position:
-        pass
+        # 이미 root 가 있다면, 애초에 위에서 에러.
+        # 때문에 여기까지 왔다면 사이즈는 반드시 1.
+        self.size = 1
 
-    def __len__(self) -> int:
+        return self._make_position(self._root)
+
+    def _add_left(self, p: Position, e: any) -> Position:
+
+        node = self._validate(p)
+
+        if node.left is None:
+            raise ValueError("left node already exists")
+
+        # 팔다리르 만들어주긴 해야함.
+        node.left = self.Node(e)
+
+        # increment size
+        self._size += 1
+
+        # 출생신고를 해줘야 해.
+        return self._make_position(node.left)
+
+    def _add_right(self, p: Position, e: any) -> Position:
+
+        # validate the position
+        node = self._validate(p)
+
+        if node.right is not None:
+            raise ValueError("the right node already exists")
+
+        node.right = self.Node(e)
+
+        # increment size
+        self._size += 1
+
+        return self._make_position(node.right)
+
+    def _replace(self, p: Position, e: any) -> any:
+        """
+        replace the elem stored at p with e.
+        :param p:
+        :param e:
+        :return: the "old" element
+        """
+        # 너 우리집 아이 맞아?
+        node = self._validate(p)
+
+        old = node.element
+
+        node.element = e
+
+        return old
+
+    def _delete(self, p) -> any:
+
+        node = self._validate(p)
+
+        # 할머니가 애들 셋을 데리고 있을 수 없으니..
+        num_children = self.num_children(p)
+
+        if num_children == 2:
+            raise ValueError("cannot delete a p with 2 children")
+
+        # who is the orphan?
+        if node.left is None:
+            orphan = node.right
+        else:
+            orphan = node.left
+
+        # 아이에게 부모를 알려줌
+        if orphan is not None:
+            orphan.parent = node.parent
+
+        # 부모에게 아이를 알려줌
+        if node is self._root:
+            self._root = orphan
+        else:
+            # is it the left child?
+            if node is node.parent.left:
+                node.parent.left = orphan
+            else:
+                node.parent.right = orphan
+
+        self._size -= 1
+
+        # now the node is deprecated
+        node.parent = node
+
+        # the element of the deleted node
+        return node.element
+
+    def _attach(self, t1: 'LinkedBinaryTree', t2: 'LinkedBinaryTree'):
         pass
