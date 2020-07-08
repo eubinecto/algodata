@@ -4,8 +4,6 @@ from abc import ABC
 
 class Tree:
     class Position:
-        # 왜 추가 파라미터가 없으면 init 구현필요 X.
-
         def element(self):
             raise NotImplementedError("this must be implemented by subclasses")
 
@@ -15,7 +13,6 @@ class Tree:
         def __ne__(self, other):
             return not (self == other)
 
-    # to be implemented by
     def root(self) -> Position:
         """
         :return: the position of the root element
@@ -91,7 +88,7 @@ class Tree:
         if self.is_leaf(p):
             # the height of a leaf is zero. (def)
             return 0
-        else: # step case
+        else:  # step case
             return 1 + max([self._height2(child) for child in self.children(p)])
 
     def positions(self) -> iter:
@@ -108,7 +105,6 @@ class Tree:
 
 
 class LinkedTree(Tree):
-
     class Position(Tree.Position):
 
         def element(self):
@@ -196,13 +192,74 @@ class ArrayBinaryTree(BinaryTree):
 
 
 class LinkedBinaryTree(BinaryTree):
+    class Node:
+        # saves memory
+        __slots__ = 'parent', 'element', "left", "right"
+
+        def __init__(self,
+                     element,
+                     parent=None,
+                     left=None,
+                     right=None):
+            self.element = element
+            self.parent = parent
+            self.left = left
+            self.right = right
+
     class Position(BinaryTree.Position):
 
+        def __init__(self,
+                     container: BinaryTree,
+                     node):
+            """
+            :param container: any container. could be list, array, .. tree.
+            :param node: another Node
+            """
+            self.container = container
+            self.node = node
+
         def element(self):
-            pass
+            return self.node.element
 
         def __eq__(self, other):
-            pass
+            return type(self) is type(other)\
+                    and self.node is other.node
+
+    def _validate(self, p: Position) -> Node:
+        """
+        what is this validating for?
+        :param p:
+        :return:
+        """
+        # check type
+        if not isinstance(p, self.Position):
+            raise TypeError("p must be a proper Position type")
+
+        # check availability
+        # the tree contains p.node.
+        # container: make it possible to check the availability in O(1)
+        if p.container is not self:
+            # 너네집 아니야.
+            #  근데 p가 뭐냐고.
+            raise ValueError("p does not belong to this tree")
+
+        # check deprecated node
+        # 이건 왜?
+        # 삭제해야하는 노드는 따로 정의해야함. node = None으로 해버리먄 Root랑 구분이 X.
+        if p.node.parent is p.node:
+            raise ValueError("p is no longer valid")
+
+        # if the position is valid, return the node
+        return p.node
+
+    def _make_position(self, node: Node):
+        """
+        when is a node None?
+        e.g. parent(self, p) if p is the position of a root node..
+        :param node:
+        :return: the position of the node
+        """
+        return self.Position(self, node) if node is not None else None
 
     def root(self) -> Position:
         pass
@@ -214,6 +271,12 @@ class LinkedBinaryTree(BinaryTree):
         pass
 
     def children(self, p: Position):
+        pass
+
+    def left(self, p: Position) -> Position:
+        pass
+
+    def right(self, p: Position) -> Position:
         pass
 
     def __len__(self) -> int:
