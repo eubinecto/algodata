@@ -15,8 +15,7 @@ class Tree(metaclass=ABCMeta):
         def __ne__(self, other):
             return not (self == other)
 
-    @abstractmethod
-    def positions(self) -> Generator[Position, ...]:
+    def positions(self):
         pass
 
     @abstractmethod
@@ -43,7 +42,7 @@ class Tree(metaclass=ABCMeta):
         raise NotImplementedError("Must be implemented in sublcass")
 
     @abstractmethod
-    def children(self, p: Position) -> Generator[Position, ...]:
+    def children(self, p: Position):
         """
         :param p: query position
         :return: children of query position
@@ -140,15 +139,14 @@ class LinkedTree(Tree, metaclass=ABCMeta):
     def num_children(self, p: Position) -> int:
         pass
 
-    def children(self, p: Position) -> Generator[Position, ...]:
+    def children(self, p: Position):
         pass
 
     def __len__(self) -> int:
         pass
 
 
-class BinaryTree(Tree, metaclass=ABCMeta):
-    @abstractmethod
+class BinaryTree(Tree):
     def left(self, p: Tree.Position) -> [Tree.Position, None]:
         """
         :param p: Query position
@@ -156,7 +154,6 @@ class BinaryTree(Tree, metaclass=ABCMeta):
         """
         return NotImplementedError("must be implemented in subclass")
 
-    @abstractmethod
     def right(self, p: Tree.Position) -> [Tree.Position, None]:
         """
         :param p: Query position
@@ -164,7 +161,6 @@ class BinaryTree(Tree, metaclass=ABCMeta):
         """
         return NotImplementedError("must be implemented in subclass")
 
-    @abstractmethod
     def sibling(self, p: Tree.Position) -> [Tree.Position, None]:
         """
         :param p:
@@ -179,7 +175,7 @@ class BinaryTree(Tree, metaclass=ABCMeta):
         else:
             return self.left(parent)
 
-    def children(self, p: Tree.Position) -> Generator[Tree.Position, Tree.Position]:
+    def children(self, p: Tree.Position):
         """
         :param p: Query position (parent)
         :return: Generator
@@ -192,11 +188,9 @@ class BinaryTree(Tree, metaclass=ABCMeta):
 
 class ArrayBinaryTree(BinaryTree, metaclass=ABCMeta):
     class Position(BinaryTree.Position):
-        @abstractmethod
         def element(self):
             raise NotImplementedError("Must be implemented in subclass")
 
-        @abstractmethod
         def __eq__(self, other):
             raise NotImplementedError("Must be implemented in sublcass")
 
@@ -249,11 +243,9 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
             self.container = container
             self.node = node
 
-        @abstractmethod
         def element(self):
             return self.node.element
 
-        @abstractmethod
         def __eq__(self, other):
             """
             Python returns false even when the type is different
@@ -325,7 +317,6 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
 
     def _add_root(self, e: any) -> Position:
         """
-
         :param e: element
         :return: position
         """
@@ -337,7 +328,6 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
 
     def _add_left(self, p: Position, e: any) -> Position:
         """
-
         :param p: position that will be parent
         :param e: child data
         :return: position of left child
@@ -346,22 +336,21 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
         if node.left is not None:
             raise ValueError('Left exists')
         self._size += 1
-        node.left = self.Node(e)
+        node.left = self.Node(e, node)
 
         return self._make_position(node.left)  # 자식 출생신고하기 -> 호적을 붙여줌.
 
     def _add_right(self, p: Position, e: any) -> Position:
         """
-
         :param p: position that will be parent
         :param e: child data
         :return: position of right child
         """
         node = self._validate(p)
-        if node.left is not None:
+        if node.right is not None:
             raise ValueError('Right exists')
         self._size += 1
-        node.right = self.Node(e)
+        node.right = self.Node(e, node)
 
         return self._make_position(node.right)
 
@@ -389,7 +378,7 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
 
         # telling to child that your new parent is my grand parent.
         if child is not None:
-            node.parent = child.parent
+            child.parent = node.parent
 
         # the node that doesn't have parent -> child becomes root
         if node is self._root:
@@ -418,22 +407,23 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
         if not self.is_leaf(p):
             raise ValueError('position must be leaf')
 
-        if not type(self) is type(t1) is type(t2):
+        if not type(self) is type(t1) or \
+           not type(self) is type(t2):
             raise TypeError('Tree types must be match')
 
         self._size += len(t1) + len(t2)
 
         if not t1.is_empty():
-            t1._root._parent = node     # t1 트리의 루트의 부모를 p의 노드로 변경
+            t1._root.parent = node     # t1 트리의 루트의 부모를 p의 노드로 변경
             node.left = t1._root        # p의 노드 왼쪽을 t1의 루트로 변경
             # t1 트리 해체
             t1._root = None
             t1._size = 0
 
         if not t2.is_empty():
-            t2._root._parent = node     # t2 트리의 루트의 부모를 p의 노드로 변경
+            t2._root.parent = node     # t2 트리의 루트의 부모를 p의 노드로 변경
             node.right = t2._root        # p의 노드 왼쪽을 t2의 루트로 변경
-            # t1 트리 해체
+            # t2 트리 해체
             t2._root = None
             t2._size = 0
 
