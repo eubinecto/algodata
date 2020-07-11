@@ -403,7 +403,37 @@ class LinkedBinaryTree(BinaryTree, metaclass=ABCMeta):
 
         self._size -= 1
         node.parent = node  # noticing that this node is deleted node
+
         return node.element
 
     def _attach(self, p: Position, t1: 'LinkedBinaryTree', t2: 'LinkedBinaryTree'):
-        pass
+        """
+        :param p: Parent position (p must be leaf)
+        :param t1: tree that will be attached
+        :param t2: tree that will be attached
+        :return:
+        """
+
+        node = self._validate(p)
+        if not self.is_leaf(p):
+            raise ValueError('position must be leaf')
+
+        if not type(self) is type(t1) is type(t2):
+            raise TypeError('Tree types must be match')
+
+        self._size += len(t1) + len(t2)
+
+        if not t1.is_empty():
+            t1._root._parent = node     # t1 트리의 루트의 부모를 p의 노드로 변경
+            node.left = t1._root        # p의 노드 왼쪽을 t1의 루트로 변경
+            # t1 트리 해체
+            t1._root = None
+            t1._size = 0
+
+        if not t2.is_empty():
+            t2._root._parent = node     # t2 트리의 루트의 부모를 p의 노드로 변경
+            node.right = t2._root        # p의 노드 왼쪽을 t2의 루트로 변경
+            # t1 트리 해체
+            t2._root = None
+            t2._size = 0
+
