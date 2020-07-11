@@ -239,7 +239,7 @@ class LinkedBinaryTree(BinaryTree):
             return type(self) is type(other)\
                     and self.node is other.node
 
-    def _validate(self, p: Position) -> Node:
+    def _validate(self, p: 'LinkedBinaryTree.Position') -> Node:
         """
         what is this validating for?
         :param p:
@@ -287,23 +287,23 @@ class LinkedBinaryTree(BinaryTree):
     def __len__(self):
         return self._size
 
-    def root(self) -> (Position, None):
+    def root(self) -> ('LinkedBinaryTree.Position', None):
         # linked binary tree의 posiiton implementation을 사옹.
         return self._make_position(self._root)
 
-    def parent(self, p: Position) -> (Position, None):
+    def parent(self, p: 'LinkedBinaryTree.Position') -> ('LinkedBinaryTree.Position', None):
         node = self._validate(p)
         return self._make_position(node.parent)
 
-    def left(self, p: Position) -> (Position, None):
+    def left(self, p: 'LinkedBinaryTree.Position') -> ('LinkedBinaryTree.Position', None):
         node = self._validate(p)
         return self._make_position(node.left)
 
-    def right(self, p: Position) -> (Position, None):
+    def right(self, p: 'LinkedBinaryTree.Position') -> ('LinkedBinaryTree.Position', None):
         node = self._validate(p)
         return self._make_position(node.right)
 
-    def num_children(self, p: Position) -> int:
+    def num_children(self, p: 'LinkedBinaryTree.Position') -> int:
         node = self._validate(p)
         count = 0
         if node.left is not None:
@@ -312,7 +312,7 @@ class LinkedBinaryTree(BinaryTree):
             count += 1
         return count
 
-    def _add_root(self, e: any) -> Position:
+    def _add_root(self, e: any) -> 'LinkedBinaryTree.Position':
         if self._root is not None:
             raise ValueError("Root already exists")
 
@@ -324,7 +324,7 @@ class LinkedBinaryTree(BinaryTree):
 
         return self._make_position(self._root)
 
-    def _add_left(self, p: Position, e: any) -> Position:
+    def _add_left(self, p: 'LinkedBinaryTree.Position', e: any) -> 'LinkedBinaryTree.Position':
 
         node = self._validate(p)
 
@@ -340,7 +340,7 @@ class LinkedBinaryTree(BinaryTree):
         # 출생신고를 해줘야 해.
         return self._make_position(node.left)
 
-    def _add_right(self, p: Position, e: any) -> Position:
+    def _add_right(self, p: 'LinkedBinaryTree.Position', e: any) -> 'LinkedBinaryTree.Position':
 
         # validate the position
         node = self._validate(p)
@@ -355,7 +355,7 @@ class LinkedBinaryTree(BinaryTree):
 
         return self._make_position(node.right)
 
-    def _replace(self, p: Position, e: any) -> any:
+    def _replace(self, p: 'LinkedBinaryTree.Position', e: any) -> any:
         """
         replace the elem stored at p with e.
         :param p:
@@ -409,5 +409,48 @@ class LinkedBinaryTree(BinaryTree):
         # the element of the deleted node
         return node.element
 
-    def _attach(self, t1: 'LinkedBinaryTree', t2: 'LinkedBinaryTree'):
-        pass
+    def _attach(self,
+                p: 'LinkedBinaryTree.Position',
+                t1: 'LinkedBinaryTree',
+                t2: 'LinkedBinaryTree'):
+        """
+        :param p: the position to which the two trees will be attached
+        :param t1: to be attached to p as a left child
+        :param t2: to be attached to p as a right child
+        :return: None
+        """
+
+        # error handling
+        # 1. validate the position: does the position exist in this tree?
+        node = self._validate(p)
+
+        # 2. position must be a leaf
+        if not self.is_leaf(p):
+            raise ValueError("The position must be a leaf")
+
+        # 3. they all must be of type linked binary tree
+        if not isinstance(t1, LinkedBinaryTree) or not isinstance(t2, LinkedBinaryTree):
+            raise TypeError("Both t1 and t2 must be of type LinkedBinaryTree")
+
+        # update the size
+        self.size += t1.size + t2.size
+
+        # if t1 is not empty, attach t1 and set t1 to be empty
+        if not t1.is_empty():
+            # 1. let the child know who the new parent is
+            t1._root.node.parent = node
+            # 2. let the parent know who the new child is
+            node.left = t1._root
+            # 3. set t1 to be empty
+            # but why set t1 to be empty?
+            t1._root = None,
+            t1._size = 0
+        # if t2 is not empty, attach t2 and set t2 to be empty
+        if not t2.is_empty():
+            # 1. let the child know who the new parent is
+            t2._root.parent = node
+            # 2. let the parent know who the new child is
+            node.right = t2._root
+            # but why set t2 to be empty?
+            t2._root = None
+            t2._size = 0
