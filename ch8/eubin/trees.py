@@ -158,7 +158,7 @@ class BinaryTree(Tree, ABC):
         else:
             return self.left(parent)
 
-    def children(self, p: Tree.Position) -> Generator:
+    def children(self, p: Tree.Position):
         if self.left(p) is not None:
             yield self.left(p)
         if self.right(p) is not None:
@@ -320,7 +320,7 @@ class LinkedBinaryTree(BinaryTree):
 
         # 이미 root 가 있다면, 애초에 위에서 에러.
         # 때문에 여기까지 왔다면 사이즈는 반드시 1.
-        self.size = 1
+        self._size = 1
 
         return self._make_position(self._root)
 
@@ -328,11 +328,11 @@ class LinkedBinaryTree(BinaryTree):
 
         node = self._validate(p)
 
-        if node.left is None:
+        if node.left is not None:
             raise ValueError("left node already exists")
 
         # 팔다리르 만들어주긴 해야함.
-        node.left = self.Node(e)
+        node.left = self.Node(e, parent=node)
 
         # increment size
         self._size += 1
@@ -348,7 +348,7 @@ class LinkedBinaryTree(BinaryTree):
         if node.right is not None:
             raise ValueError("the right node already exists")
 
-        node.right = self.Node(e)
+        node.right = self.Node(e, parent=node)
 
         # increment size
         self._size += 1
@@ -373,6 +373,7 @@ class LinkedBinaryTree(BinaryTree):
 
     def _delete(self, p) -> any:
 
+        # check if p is valid and get the node of p
         node = self._validate(p)
 
         # 할머니가 애들 셋을 데리고 있을 수 없으니..
@@ -433,17 +434,17 @@ class LinkedBinaryTree(BinaryTree):
             raise TypeError("Both t1 and t2 must be of type LinkedBinaryTree")
 
         # update the size
-        self.size += t1.size + t2.size
+        self._size += len(t1) + len(t2)
 
         # if t1 is not empty, attach t1 and set t1 to be empty
         if not t1.is_empty():
             # 1. let the child know who the new parent is
-            t1._root.node.parent = node
+            t1._root.parent = node
             # 2. let the parent know who the new child is
             node.left = t1._root
             # 3. set t1 to be empty
             # but why set t1 to be empty?
-            t1._root = None,
+            t1._root = None
             t1._size = 0
         # if t2 is not empty, attach t2 and set t2 to be empty
         if not t2.is_empty():
