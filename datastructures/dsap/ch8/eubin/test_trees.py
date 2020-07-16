@@ -1,7 +1,7 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
 
-from ch8.eubin.trees import LinkedBinaryTree, ArrayBinaryTree
+from datastructures.ch8 import LinkedBinaryTree, ArrayBinaryTree
 
 
 class TestLinkedBinaryTree(TestCase):

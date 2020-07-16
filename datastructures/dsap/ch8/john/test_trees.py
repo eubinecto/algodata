@@ -1,7 +1,7 @@
 from unittest import TestCase
-from unittest.mock import Mock, MagicMock
+from unittest.mock import MagicMock
 
-from ch8.john.trees import LinkedBinaryTree, ArrayBinaryTree
+from datastructures.ch8.john import LinkedBinaryTree, ArrayBinaryTree
 
 
 # asert~~~~~( EXPECTED, ACTUAL)
