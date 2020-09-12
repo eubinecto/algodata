@@ -8,6 +8,10 @@ __pycache__/
 # C extensions
 *.so
 
+# virtual environment
+agdenv
+
+
 # Distribution / packaging
 .Python
 build/
@@ -139,11 +143,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-### Example user template template
-### Example user template
-
-# IntelliJ project files
-.idea
-*.iml
-out
-gen
+.idea/
