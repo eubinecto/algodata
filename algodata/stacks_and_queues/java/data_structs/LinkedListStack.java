@@ -1,14 +1,14 @@
-package stacksAndQueues.java;
+package stacks_and_queues.java.data_structs;
 
 import java.util.EmptyStackException;
-import java.util.Stack;
 
 // using generic
 /*
  * Stack is a LIFO data structure.
  * Last In First Out.
+ * parameterised type T.
  */
-public class MyStack<T> {
+public class LinkedListStack<T> {
     // inner data class for stack
     // houses data with the same generic data type T
     private static class StackNode<T> {
