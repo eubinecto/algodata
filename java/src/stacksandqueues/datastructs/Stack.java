@@ -1,4 +1,4 @@
-package stacks_and_queues.java.data_structs;
+package stacksandqueues.datastructs;
 
 import java.util.EmptyStackException;
 
@@ -8,19 +8,18 @@ import java.util.EmptyStackException;
  * Last In First Out.
  * parameterised type T.
  */
-public class LinkedListStack<T> {
+public class Stack<T> {
     // inner data class for stack
     // houses data with the same generic data type T
     private static class StackNode<T> {
         private final T data; // data is final
         private StackNode<T> next; // but next node should not be final
-
         public StackNode(T data) {
             this.data = data;
             // if not assigned, the value will be null.
             // here, next node is not assigned,so the value of it
             // is null
-        }
+        } // constructor for stack node
     } // Stack Node
     //the stack node maintains this.
     private StackNode<T> top;
