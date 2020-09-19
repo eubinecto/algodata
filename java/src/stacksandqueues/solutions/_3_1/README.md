@@ -2,7 +2,7 @@
 
 > Describe how you could use a single array to implement three stacks. (pg 98, chapter 3)
 
-hints: #2, #12, #38, #58
+- hints: #2, #12, #38, #58
 
 ## attempt1
 
@@ -38,14 +38,64 @@ wait, but the page table approach is exactly the same as the "sections' approach
 - context switching?
 - dirty location?
 
+No, this is not what you want..
+
+
 
 ##  hints
 ### 2
-A linkedListStack is simply a data structure in which the most recently added elements are
+> A linkedListStack is simply a data structure in which the most recently added elements are
 removed first. Can you simulate a single linkedListStack using an array? Remember that there are
 many possible solutions, and there are tradeoffs of each.
 
 
+What are the trade-offs?
+
+
+stack | last inserted element | required space
+--- | --- | ---
+`LinkedListStack` | Slow; O(N) but can be O(1) if maintains `lastNode` pointer  | just N 
+`ArrayStack` | Fast; O(1) | N + more
+
+
+
+time complexities of the implementations:
+
+operation | LinkedListStack | ArrayStack
+--- | --- | ---
+push | O(1), amortised | O(1)
+pop | O(1) | O(1)
+peek | O(1) | O(1)
+isEmpty | O(1) | O(1)
  
+the  time complexities are the same, except that `push` in ArrayStack runs in **amortised** O(1).
+
+and array stack requires more space than LinkedListStack, as the capacity of the array will always be larger than the
+size of the stack.
+
+### 12
+> We could simulate three stacks in an array by just allocating the first third of the array to
+  the first stack, the second third to the second stack, and the final third to the third stack.
+  One might actually be much bigger than the others, though. Can we be more flexible
+  with the divisions?
       
+      
+Yup, this is what immediately came to mind. (the simple approach).
+
+
+### 38
+
+> If you want to allow for flexible divisions, you can shift stacks around. Can you ensure
+that all available capacity is used?
+
+
+what does it mean by  "shift stacks around"?
+
+### 58
+> Try thinking about the array as circular, such that the end of the array "wraps around"to
+the start of the array.
+
+
+Ha...? something like collision resolution? But that way we have to search through the array..
+Which is not the most efficient way of doing this.
 

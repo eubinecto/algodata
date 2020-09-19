@@ -37,6 +37,7 @@ public class LinkedListStack<T> implements Stack<T> {
         peek()
         isEmpty()
          */
+    @Override
     public T pop() {
         if (this.isEmpty()) {
             // Ha! so there is an exception class like this.
@@ -47,12 +48,14 @@ public class LinkedListStack<T> implements Stack<T> {
         return poppedData;
     }
 
+    @Override
     public void push(T item) {
         LinkedList<T> newNode = new LinkedList<>(item);
         newNode.next = this.top; // the top is the next one to the new node
         this.top = newNode; // newNode is now at the top
     }
 
+    @Override
     public T peek() {
         if (this.isEmpty()) {
             throw new EmptyStackException();
@@ -61,6 +64,7 @@ public class LinkedListStack<T> implements Stack<T> {
         return this.top.data;
     }
 
+    @Override
     public boolean isEmpty() {
         // how do I check if the stack is empty?
         // just check this out

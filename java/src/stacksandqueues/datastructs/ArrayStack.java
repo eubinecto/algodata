@@ -30,6 +30,7 @@ public class ArrayStack<T> implements Stack<T> {
         }
     }
 
+    @Override
     public void push(T item) {
         // insert the index, and then increment the size
         this.ensureSize(); // ensure the size of the array then store the item
@@ -37,6 +38,7 @@ public class ArrayStack<T> implements Stack<T> {
     }
 
     //but why does it complain about this?
+    @Override
     @SuppressWarnings("unchecked")
     public T pop() {
         if (this.isEmpty()) {
@@ -49,7 +51,7 @@ public class ArrayStack<T> implements Stack<T> {
         return toReturn;
     } // pop
 
-
+    @Override
     @SuppressWarnings("unchecked")
     public T peek() {
         if (this.isEmpty()) {
@@ -59,6 +61,7 @@ public class ArrayStack<T> implements Stack<T> {
         return (T) this.dataArray[(this.size - 1)];
     } // peek
 
+    @Override
     public boolean isEmpty() {
         return this.size == 0;
     }
